@@ -1,61 +1,74 @@
 #include "Adafruit_NeoTrellisM4.h"
-#include "sequencer.h"
 
 // arduino board (from IDE): Adafruit Trellis M4 (SAMD51)
 
 // The NeoTrellisM4 object is a keypad and neopixel strip subclass
 // that does things like auto-update the NeoPixels and stuff!
 Adafruit_NeoTrellisM4 trellis = Adafruit_NeoTrellisM4();
-Sequencer sequencer;
 
+unsigned int millisStepCount; // counter
+unsigned int beatPeriod; // milliseconds between beats
+uint8_t beat; // current beat
 boolean lit_keys[32];
-uint8_t beat;
+uint32_t colors[4];
 
-void setup(){
+void setup() {
   Serial.begin(115200);
 
+  setBeatPeriod(400);
+  millisStepCount = 0;
+  beat = 0;
+
   trellis.begin();
-  trellis.setBrightness(80);
+  trellis.setBrightness(255);
   trellis.autoUpdateNeoPixels(false);
-  sequencer.begin();
 
 
   Serial.println("Chris-mas present");
-  beat = 7; // start at max
-
   for (uint8_t i=0; i<32; i++) {
     lit_keys[i] = false;
   }
-
-
+  for (uint8_t i=0; i<4; i++) {
+    colors[i] = Wheel(i * 255 / 4);
+    Serial.print(i);
+    Serial.print(" - ");
+    Serial.print(colors[i]);
+    Serial.print(" - ");
+    Serial.print(halfColor(colors[i]));
+  }
 }
 
 void loop() {
-  sequencer.run();
-
-  // put your main code here, to run repeatedly:
-  beat = ++beat % 8;
-  // Serial.print("the beat is: ");
-  // Serial.println(beat);
-
+  unsigned int nextMStep = millis() / beatPeriod;
+  if (nextMStep != millisStepCount) {
+    millisStepCount = nextMStep;
+    advanceBeat();
+  }
 
   trellis.tick();
-  trellis.fill(0);
-  // trellis.setPixelColor(beat, 0x800000);
   listen();
   showColors();
-  trellis.show();
-
-  delay(10);
-  // delay(250);
+  delay(5);
 }
 
 
+void setBeatPeriod(unsigned int p) {
+  if (p < 100) beatPeriod = 100; // min is 0.1 sec
+  else if (p > 4000) beatPeriod = 4000; // max is 4 seconds
+  else beatPeriod = p;
+}
 
+void advanceBeat() {
+  beat = ++beat % 8;
+  Serial.print("the beat is now: ");
+  Serial.println(beat);
 
+  // TODO: Play sound(s)
+}
 
 void listen() {
-  while(trellis.available()) {
+  // while(trellis.available()) {
+  if(trellis.available()) {
     keypadEvent e = trellis.read();
     int key = e.bit.KEY;
     if(e.bit.EVENT == KEY_JUST_PRESSED) {
@@ -63,17 +76,33 @@ void listen() {
       if (lit_keys[key]) Serial.print("Activating");
       else Serial.print("De-Activating");
       Serial.print(" key "); Serial.println(key);
-      break;
+      // break;
     }
   }
 }
 
 void showColors() {
   for (uint8_t i = 0; i <32; i++) {
-    if (lit_keys[i]) {
-      trellis.setPixelColor(i, Wheel(i * 255 / 32)); // rainbow!
+    byte row = i / 8;
+    if (i % 8 == beat) {
+      if (lit_keys[i]) {
+        // trellis.setPixelColor(i, Wheel(i * 255 / 32));
+        trellis.setPixelColor(i, colors[row]);
+      } else {
+        // trellis.setPixelColor(i, 0x800000);
+        trellis.setPixelColor(i, 0x444444);
+      }
+    } else {
+      // key is not on current beat
+      // light up if key is selected
+      if (lit_keys[i]) {
+        trellis.setPixelColor(i, halfColor(colors[row]));
+      } else {
+        trellis.setPixelColor(i, 0);
+      }
     }
   }
+  trellis.show();
 }
 
 
@@ -92,18 +121,6 @@ uint32_t Wheel(byte WheelPos) {
   return trellis.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-
-//
-// static inline void acknowledgeInterrupt()
-// {
-//   Serial.println("ack interrupt");
-// 	if (SEQ_TC->COUNT16.INTFLAG.bit.MC0 == 1) {
-// 		SEQ_TC->COUNT16.INTFLAG.bit.MC0 = 1;
-// 	}
-// }
-//
-// // this gets called when the timer fires
-// void SEQ_Handler()
-// {
-// 	acknowledgeInterrupt();
-// }
+uint32_t halfColor(uint32_t full) {
+  return trellis.Color(full >> 18, (full & 0xff00) >> 10, (full & 255) >> 2);
+}
