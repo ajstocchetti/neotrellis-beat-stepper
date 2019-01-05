@@ -23,19 +23,10 @@ void setup() {
   trellis.setBrightness(255);
   trellis.autoUpdateNeoPixels(false);
 
-
-  Serial.println("Chris-mas present");
   for (uint8_t i=0; i<32; i++) {
     lit_keys[i] = false;
   }
-  for (uint8_t i=0; i<4; i++) {
-    colors[i] = Wheel(i * 255 / 4);
-    Serial.print(i);
-    Serial.print(" - ");
-    Serial.print(colors[i]);
-    Serial.print(" - ");
-    Serial.print(halfColor(colors[i]));
-  }
+  for (uint8_t i=0; i<4; i++) colors[i] = Wheel(i * 255 / 4);
 }
 
 void loop() {
@@ -96,7 +87,7 @@ void showColors() {
       // key is not on current beat
       // light up if key is selected
       if (lit_keys[i]) {
-        trellis.setPixelColor(i, halfColor(colors[row]));
+        trellis.setPixelColor(i, dimColor(colors[row]));
       } else {
         trellis.setPixelColor(i, 0);
       }
@@ -121,6 +112,6 @@ uint32_t Wheel(byte WheelPos) {
   return trellis.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-uint32_t halfColor(uint32_t full) {
+uint32_t dimColor(uint32_t full) {
   return trellis.Color(full >> 18, (full & 0xff00) >> 10, (full & 255) >> 2);
 }
