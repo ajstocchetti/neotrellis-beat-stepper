@@ -1,12 +1,4 @@
-/*
- * sampler.cpp
- *
- *  Created on: Oct 22, 2018
- *      Author: dean
- */
-
 #include "sampler.h"
-#include "recorder.h"
 #include "Adafruit_SPIFlash.h"
 #include "Adafruit_QSPI_GD25Q.h"
 extern Adafruit_QSPI_GD25Q flash;
@@ -125,14 +117,15 @@ void Sampler::playSound(uint8_t num)
 {
 	if(num < NUM_SOUNDS)
 		sounds[num].play(soundFiles[num]);
-	else if(num < NUM_SOUNDS+NUM_RECORDINGS){
-		num -= NUM_SOUNDS;
-		recordings[num].play(REC_FILESIZE*num);
-	}
+	// else if(num < NUM_SOUNDS+NUM_RECORDINGS){
+	// 	num -= NUM_SOUNDS;
+	// 	recordings[num].play(REC_FILESIZE*num);
+	// }
 }
 
 void AudioPlayQspiRaw::play(uint32_t addr)
 {
+	return; // AJS - remove this
 	// get length from file
 	flash.readMemory(addr, (byte*)&length, sizeof(uint32_t), false);
 	playing = true;
@@ -147,6 +140,7 @@ void AudioPlayQspiRaw::stop(void)
 
 void AudioPlayQspiRaw::update(void)
 {
+	return; // AJS - remove this
 	audio_block_t *block;
 	int16_t *out;
 	uint32_t consumed;
@@ -171,6 +165,3 @@ void AudioPlayQspiRaw::update(void)
 	transmit(block);
 	release(block);
 }
-
-
-

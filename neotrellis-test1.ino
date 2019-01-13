@@ -1,11 +1,12 @@
 #include "Adafruit_NeoTrellisM4.h"
-#include "playalong_notes.h"
+// #include "playalong_notes.h"
+// #include "sampler.h"
+
 
 // arduino board (from IDE): Adafruit Trellis M4 (SAMD51)
 
-// The NeoTrellisM4 object is a keypad and neopixel strip subclass
-// that does things like auto-update the NeoPixels and stuff!
 Adafruit_NeoTrellisM4 trellis = Adafruit_NeoTrellisM4();
+// Sampler sampler;
 
 unsigned int millisStepCount; // counter
 unsigned int beatPeriod; // milliseconds between beats
@@ -32,12 +33,13 @@ void setup() {
   for (uint8_t i=0; i<4; i++) colors[i] = Wheel(i * 255 / 4);
 
   // setup audio
-  setupPlayalongAudio();
-  notesOffMils = 0;
+  // setupPlayalongAudio();
+  // notesOffMils = 0;
+  // sampler.begin();
 }
 
 void loop() {
-  if (millis() > notesOffMils) allNotesOff();
+  // if (millis() > notesOffMils) allNotesOff();
   unsigned int nextMStep = millis() / beatPeriod;
   if (nextMStep != millisStepCount) {
     millisStepCount = nextMStep;
@@ -63,15 +65,8 @@ void advanceBeat() {
   Serial.println(beat);
 
   // TODO: Play sound(s)
-  playFromPlayalong();
-}
-
-void playFromPlayalong() {
-  for (uint8_t x = 0; x < 4; x++) {
-    int key = beat + (8 * x);
-    if (lit_keys[key]) noteOn(key);
-  }
-  notesOffMils = millis() + beatPeriod/2;
+  // playFromPlayalong();
+  // samplerTest();
 }
 
 void listen() {
