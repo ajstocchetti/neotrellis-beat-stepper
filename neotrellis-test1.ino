@@ -1,12 +1,9 @@
 #include "Adafruit_NeoTrellisM4.h"
-// #include "playalong_notes.h"
-// #include "sampler.h"
-
+#include "trellis_flash_sampler.h"
 
 // arduino board (from IDE): Adafruit Trellis M4 (SAMD51)
 
 Adafruit_NeoTrellisM4 trellis = Adafruit_NeoTrellisM4();
-// Sampler sampler;
 
 unsigned int millisStepCount; // counter
 unsigned int beatPeriod; // milliseconds between beats
@@ -33,9 +30,7 @@ void setup() {
   for (uint8_t i=0; i<4; i++) colors[i] = Wheel(i * 255 / 4);
 
   // setup audio
-  // setupPlayalongAudio();
-  // notesOffMils = 0;
-  // sampler.begin();
+  setupSampler();
 }
 
 void loop() {
@@ -63,10 +58,15 @@ void advanceBeat() {
   beat = ++beat % 8;
   Serial.print("the beat is now: ");
   Serial.println(beat);
+  // Play sound(s)
+  playSynth();
+}
 
-  // TODO: Play sound(s)
-  // playFromPlayalong();
-  // samplerTest();
+void playSynth() {
+  if (lit_keys[beat]) playZero();
+  if (lit_keys[beat + 8]) playOne();
+  if (lit_keys[beat + 16]) playTwo();
+  if (lit_keys[beat + 24]) playThree();
 }
 
 void listen() {
