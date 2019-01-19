@@ -9,14 +9,15 @@ unsigned int millisStepCount; // counter
 unsigned int beatPeriod; // milliseconds between beats
 uint8_t beat; // current beat
 boolean lit_keys[32];
-uint32_t colors[4];
+uint32_t Wheel(byte WheelPos);
+uint32_t colors[4] = {Wheel(0), Wheel(191), Wheel(127), Wheel(63)};
 unsigned long notesOffMils;
 
 
 void setup() {
   Serial.begin(115200);
 
-  setBeatPeriod(400);
+  setBeatPeriod(375);
   millisStepCount = 0;
   beat = 0;
 
@@ -27,7 +28,7 @@ void setup() {
   for (uint8_t i=0; i<32; i++) {
     lit_keys[i] = false;
   }
-  for (uint8_t i=0; i<4; i++) colors[i] = Wheel(i * 255 / 4);
+  // for (uint8_t i=0; i<4; i++) colors[i] = Wheel(i * 255 / 4);
 
   // setup audio
   setupSampler();

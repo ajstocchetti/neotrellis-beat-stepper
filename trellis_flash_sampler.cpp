@@ -63,16 +63,16 @@ void setupSampler() {
 
 
 void playZero() {
-  sound0.play(AudioSampleSnare);
+  sound0.play(AudioSampleHihat);
 }
 void playOne() {
-  sound1.play(AudioSampleTomtom);
+  sound1.play(AudioSampleKick);
 }
 void playTwo() {
-  sound2.play(AudioSampleHihat);
+  sound2.play(AudioSampleTomtom);
 }
 void playThree() {
-  sound3.play(AudioSampleKick);
+  sound3.play(AudioSampleSnare);
 }
 void playFour() {
   sound4.play(AudioSampleGong);
