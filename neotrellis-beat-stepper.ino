@@ -35,7 +35,6 @@ void setup() {
 }
 
 void loop() {
-  // if (millis() > notesOffMils) allNotesOff();
   unsigned int nextMStep = millis() / beatPeriod;
   if (nextMStep != millisStepCount) {
     millisStepCount = nextMStep;
@@ -44,8 +43,8 @@ void loop() {
 
   trellis.tick();
   listen();
-  showColors();
-  delay(5);
+  // showColors();
+  delay(10);
 }
 
 
@@ -57,8 +56,8 @@ void setBeatPeriod(unsigned int p) {
 
 void advanceBeat() {
   beat = ++beat % 8;
-  // Play sound(s)
-  playSynth();
+  showColors(); // move lit row
+  playSynth(); // play sound(s)
 }
 
 void playSynth() {
@@ -74,11 +73,17 @@ void listen() {
     int key = e.bit.KEY;
     if(e.bit.EVENT == KEY_JUST_PRESSED) {
       lit_keys[key] = !lit_keys[key];
+      showColors();
     }
   }
 }
 
 void showColors() {
+  // showColors was causing background noise when calling in the loop function
+  // it has something to do with the trellis.show() function
+  // so,
+  // only call it when LEDs need to be updated
+  // such as on beat change and button press
   for (uint8_t i = 0; i <32; i++) {
     byte row = i / 8;
     if (i % 8 == beat) {
