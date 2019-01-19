@@ -15,7 +15,7 @@ unsigned long notesOffMils;
 
 
 void setup() {
-  Serial.begin(115200);
+  // Serial.begin(115200);
 
   setBeatPeriod(375);
   millisStepCount = 0;
@@ -57,8 +57,6 @@ void setBeatPeriod(unsigned int p) {
 
 void advanceBeat() {
   beat = ++beat % 8;
-  Serial.print("the beat is now: ");
-  Serial.println(beat);
   // Play sound(s)
   playSynth();
 }
@@ -71,16 +69,11 @@ void playSynth() {
 }
 
 void listen() {
-  // while(trellis.available()) {
   if(trellis.available()) {
     keypadEvent e = trellis.read();
     int key = e.bit.KEY;
     if(e.bit.EVENT == KEY_JUST_PRESSED) {
       lit_keys[key] = !lit_keys[key];
-      if (lit_keys[key]) Serial.print("Activating");
-      else Serial.print("De-Activating");
-      Serial.print(" key "); Serial.println(key);
-      // break;
     }
   }
 }
